@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace Fractal
 {
-    public partial class Form1 : Form
+    public partial class Fractal : Form
     {
-        public Form1()
+        public Fractal()
         {
             InitializeComponent();
         }
