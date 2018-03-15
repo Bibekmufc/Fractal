@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.menu = new System.Windows.Forms.MenuStrip();
-            this.mandlebrot_img = new System.Windows.Forms.PictureBox();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.panel = new System.Windows.Forms.PictureBox();
             this.menu.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mandlebrot_img)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panel)).BeginInit();
             this.SuspendLayout();
             // 
             // menu
@@ -46,34 +46,38 @@
             this.menu.TabIndex = 0;
             this.menu.Text = "menuStrip1";
             // 
-            // mandlebrot_img
-            // 
-            this.mandlebrot_img.BackColor = System.Drawing.Color.Black;
-            this.mandlebrot_img.Location = new System.Drawing.Point(0, 27);
-            this.mandlebrot_img.Name = "mandlebrot_img";
-            this.mandlebrot_img.Size = new System.Drawing.Size(1208, 483);
-            this.mandlebrot_img.TabIndex = 1;
-            this.mandlebrot_img.TabStop = false;
-            // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(44, 24);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // panel
+            // 
+            this.panel.BackColor = System.Drawing.Color.Black;
+            this.panel.Location = new System.Drawing.Point(0, 31);
+            this.panel.Name = "panel";
+            this.panel.Size = new System.Drawing.Size(1208, 479);
+            this.panel.TabIndex = 1;
+            this.panel.TabStop = false;
+            this.panel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel_MouseDown);
+            this.panel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel_MouseMove);
+            this.panel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel_MouseUp);
+            // 
             // Fractal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1208, 564);
-            this.Controls.Add(this.mandlebrot_img);
+            this.Controls.Add(this.panel);
             this.Controls.Add(this.menu);
             this.MainMenuStrip = this.menu;
             this.Name = "Fractal";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Fractal_Load);
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mandlebrot_img)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panel)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -83,7 +87,7 @@
 
         private System.Windows.Forms.MenuStrip menu;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.PictureBox mandlebrot_img;
+        private System.Windows.Forms.PictureBox panel;
     }
 }
 

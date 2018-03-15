@@ -13,7 +13,7 @@ namespace Fractal
         {
             rChan = gChan = bChan = 0;
         }
-        public void FromHSB(float h, float s, float b)
+        public void ToRGB(float h, float s, float b)
         {
             float red = b;
             float green = b;
@@ -70,11 +70,10 @@ namespace Fractal
                 }
             }
 
-            rChan = Math.Round(Math.Min(Math.Max(red, 0f), 255));
-            gChan = Math.Round(Math.Min(Math.Max(green, 0), 255));
-            bChan = Math.Round(Math.Min(Math.Max(blue, 0), 255));
+            rChan = (float)Math.Round(Math.Min(Math.Max(red, 0f), 255));
+            gChan = (float)Math.Round(Math.Min(Math.Max(green, 0f), 255));
+            bChan = (float)Math.Round(Math.Min(Math.Max(blue, 0f), 255));
 
         }
     }
-
 }
