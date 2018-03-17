@@ -54,7 +54,7 @@
             // 
             // panel
             // 
-            this.panel.BackColor = System.Drawing.Color.Black;
+            this.panel.BackColor = System.Drawing.SystemColors.Control;
             this.panel.Location = new System.Drawing.Point(0, 31);
             this.panel.Name = "panel";
             this.panel.Size = new System.Drawing.Size(1208, 479);

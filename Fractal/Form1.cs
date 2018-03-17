@@ -27,7 +27,6 @@ namespace Fractal
         private Graphics g;
         private Cursor c1, c2;
         private HSB HSBcol = new HSB();
-        private bool isRunning = true;
 
 
         //starts when form loads
@@ -53,6 +52,7 @@ namespace Fractal
             rectangle = false;
             xzoom = (xend - xstart) / (double)x1;
             yzoom = (yend - ystart) / (double)y1;
+            Mandelbrot();
         }
 
         private void panel_MouseMove(object sender, MouseEventArgs e)
@@ -103,6 +103,7 @@ namespace Fractal
                 xzoom = (xend - xstart) / (double)x1;
                 yzoom = (yend - ystart) / (double)y1;
                 rectangle = false;
+                Mandelbrot();
             }
         }
 
@@ -115,7 +116,6 @@ namespace Fractal
                 rectangle = true;
             }
         }
-
         public Fractal()
         {
             InitializeComponent();
@@ -136,45 +136,43 @@ namespace Fractal
 
         private void initvalues() // reset start values
         {
-            string[] state = Values();
-
-            if (isRunning)
-            {
-                isRunning = false;
-                xstart = float.Parse(state[6]);
-                ystart = float.Parse(state[7]);
-                xend = float.Parse(state[8]);
-                yend = float.Parse(state[9]);
-            }
-            else
-            {
-                xstart = sX;
-                ystart = sY;
-                xend = sX;
-                yend = sY;
-                if ((float)((xend - xstart) / (yend - ystart)) != xy)
-                    xstart = xend - (yend - ystart) * (double)xy;
-            }
+            xstart = sX;
+            ystart = sY;
+            xend = eX;
+            yend = eY;
+            if ((float)((xend - xstart) / (yend - ystart)) != xy)
+                xstart = xend - (yend - ystart) * (double)xy;
         }
-        private string[] Values()
+
+
+        // Algorithm for Mandelbrot Calculation
+        private void Mandelbrot() // calculates all possible points
         {
-            string line = " ";
-            string temp = "";
-            string[] list = { };
-            int counter = 1;
-            System.IO.StreamReader file = new System.IO.StreamReader("config.txt");
-            while ((line = file.ReadLine()) != null)
-            {
-                temp += (line + ",");
-            }
-            list = temp.Split(',');
-            file.Close();
+            int x, y;
+            float h, b, alt = 0.0f;
 
-            return list;
+            action = false;
+            this.Cursor = c1;
+
+            Pen pen = null;
+
+            for (x = 0; x < x1; x += 2)
+                for (y = 0; y < y1; y++)
+                {
+                    h = PixelColour(xstart + xzoom * (double)x, ystart + yzoom * (double)y); // color value
+                    if (h != alt)
+                    {
+                        b = 1.0f - h * h; // brightnes
+                                          ///djm added
+                        Color col = HSB.ToRGB(h, 0.8f, b);
+                        pen = new Pen(col);
+                        alt = h;
+                    }
+                    g.DrawLine(pen, x, y, x + 1, y);
+                }
+            this.Cursor = c2;
+            action = true;
         }
-
-        // The algorithm
-       
 
         private float PixelColour(double xwert, double ywert) // color value from 0.0 to 1.0 by iterations
         {
@@ -209,9 +207,7 @@ namespace Fractal
                     if (ys < ye) g.DrawRectangle(pen, xe, ys, (xs - xe), (ye - ys));
                     else g.DrawRectangle(pen, xe, ye, (xs - xe), (ys - ye));
                 }
-            }
-
-
+            } 
         }
 
 

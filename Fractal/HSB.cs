@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,72 +9,62 @@ namespace Fractal
 {
     class HSB
     {
-        public float rChan, gChan, bChan;
+        public float red, green, blue;
+
         public HSB()
         {
-            rChan = gChan = bChan = 0;
+            red = green = blue = 0;
+
         }
-        public void ToRGB(float h, float s, float b)
+        public static Color ToRGB(float hue, float saturation, float brightness)
         {
-            float red = b;
-            float green = b;
-            float blue = b;
-            if (s != 0)
+            int r = 0, g = 0, b = 0;
+            if (saturation == 0)
             {
-                float max = b;
-                float dif = b * s / 255f;
-                float min = b - dif;
-
-                float h2 = h * 360f / 255f;
-
-                if (h2 < 60f)
+                r = g = b = (int)(brightness * 255.0f + 0.5f);
+            }
+            else
+            {
+                float h = (hue - (float)Math.Floor(hue)) * 6.0f;
+                float f = h - (float)Math.Floor(h);
+                float p = brightness * (1.0f - saturation);
+                float q = brightness * (1.0f - saturation * f);
+                float t = brightness * (1.0f - (saturation * (1.0f - f)));
+                switch ((int)h)
                 {
-                    red = max;
-                    green = h2 * dif / 60f + min;
-                    blue = min;
-                }
-                else if (h2 < 120f)
-                {
-                    red = -(h2 - 120f) * dif / 60f + min;
-                    green = max;
-                    blue = min;
-                }
-                else if (h2 < 180f)
-                {
-                    red = min;
-                    green = max;
-                    blue = (h2 - 120f) * dif / 60f + min;
-                }
-                else if (h2 < 240f)
-                {
-                    red = min;
-                    green = -(h2 - 240f) * dif / 60f + min;
-                    blue = max;
-                }
-                else if (h2 < 300f)
-                {
-                    red = (h2 - 240f) * dif / 60f + min;
-                    green = min;
-                    blue = max;
-                }
-                else if (h2 <= 360f)
-                {
-                    red = max;
-                    green = min;
-                    blue = -(h2 - 360f) * dif / 60 + min;
-                }
-                else
-                {
-                    red = 0;
-                    green = 0;
-                    blue = 0;
+                    case 0:
+                        r = (int)(brightness * 255.0f + 0.5f);
+                        g = (int)(t * 255.0f + 0.5f);
+                        b = (int)(p * 255.0f + 0.5f);
+                        break;
+                    case 1:
+                        r = (int)(q * 255.0f + 0.5f);
+                        g = (int)(brightness * 255.0f + 0.5f);
+                        b = (int)(p * 255.0f + 0.5f);
+                        break;
+                    case 2:
+                        r = (int)(p * 255.0f + 0.5f);
+                        g = (int)(brightness * 255.0f + 0.5f);
+                        b = (int)(t * 255.0f + 0.5f);
+                        break;
+                    case 3:
+                        r = (int)(p * 255.0f + 0.5f);
+                        g = (int)(q * 255.0f + 0.5f);
+                        b = (int)(brightness * 255.0f + 0.5f);
+                        break;
+                    case 4:
+                        r = (int)(t * 255.0f + 0.5f);
+                        g = (int)(p * 255.0f + 0.5f);
+                        b = (int)(brightness * 255.0f + 0.5f);
+                        break;
+                    case 5:
+                        r = (int)(brightness * 255.0f + 0.5f);
+                        g = (int)(p * 255.0f + 0.5f);
+                        b = (int)(q * 255.0f + 0.5f);
+                        break;
                 }
             }
-
-            rChan = (float)Math.Round(Math.Min(Math.Max(red, 0f), 255));
-            gChan = (float)Math.Round(Math.Min(Math.Max(green, 0f), 255));
-            bChan = (float)Math.Round(Math.Min(Math.Max(blue, 0f), 255));
-
+            return Color.FromArgb(Convert.ToByte(255), Convert.ToByte(r), Convert.ToByte(g), Convert.ToByte(b));
         }
     }
 }
