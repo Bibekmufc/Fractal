@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,13 +28,33 @@ namespace Fractal
         private Image picture;
         private Graphics g;
         private Cursor c1, c2;
-        private HSB HSBcol = new HSB();
+        private bool cColour;
+        Random rd = new Random();
+        Color[] change = new Color[6];
 
+
+        private HSB HSBcol = new HSB();
+        private bool clicked = false;
+
+
+        public Fractal()
+        {
+            InitializeComponent();
+            this.DoubleBuffered = true;
+
+        }
+
+        //loads form
+        private void Fractal_Load(object sender, EventArgs e)
+        {
+            init();
+            Colour();
+            start();
+        }
 
         //starts when form loads
         public void init() // all instances will be prepared
         {
-            //HSBcol = new HSB();
             finished = false;
             c1 = Cursors.WaitCursor;
             c2 = Cursors.Cross;
@@ -50,11 +72,35 @@ namespace Fractal
         {
             action = false;
             rectangle = false;
+            initvalues(); //missing out initvalues() made the image to be all zoomed when the form loaded
             xzoom = (xend - xstart) / (double)x1;
             yzoom = (yend - ystart) / (double)y1;
             Mandelbrot();
         }
 
+
+        private void initvalues() // reset start values
+        {
+            xstart = sX;
+            ystart = sY;
+            xend = eX;
+            yend = eY;
+            if ((float)((xend - xstart) / (yend - ystart)) != xy)
+                xstart = xend - (yend - ystart) * (double)xy;
+        }
+
+        //when right mouse button(rmb) is pressed
+        private void panel_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (action)
+            {
+                xs = e.X;
+                ys = e.Y;
+                rectangle = true;
+            }
+        }
+
+        //when rmb is pressed and moved
         private void panel_MouseMove(object sender, MouseEventArgs e)
         {
 
@@ -64,10 +110,11 @@ namespace Fractal
                 ye = e.Y;
 
                 Graphics g = panel.CreateGraphics();
-                update(g);
+                Update(g);
             }
         }
 
+        //when rmb is released
         private void panel_MouseUp(object sender, MouseEventArgs e)
         {
             int z, w;
@@ -106,71 +153,46 @@ namespace Fractal
                 Mandelbrot();
             }
         }
-
-        private void panel_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (action)
-            {
-                xs = e.X;
-                ys = e.Y;
-                rectangle = true;
-            }
-        }
-        public Fractal()
-        {
-            InitializeComponent();
-        }
-
-
-        private void Fractal_Load(object sender, EventArgs e)
-        {
-            init();
-            start();
-        }
-
+      
+        //paints mandlebrot in the designated panel
         private void panel_Paint(object sender, PaintEventArgs e)
         {
             Graphics graphics = e.Graphics;
             graphics.DrawImage(picture, 0, 0);
         }
 
-        private void initvalues() // reset start values
-        {
-            xstart = sX;
-            ystart = sY;
-            xend = eX;
-            yend = eY;
-            if ((float)((xend - xstart) / (yend - ystart)) != xy)
-                xstart = xend - (yend - ystart) * (double)xy;
-        }
 
 
         // Algorithm for Mandelbrot Calculation
         private void Mandelbrot() // calculates all possible points
         {
             int x, y;
-            float h, b, alt = 0.0f;
+            float h, b, alt = 0.0f, c;
+            Pen pn = null;
+            Color col;
 
             action = false;
-            this.Cursor = c1;
-
-            Pen pen = null;
-
+            panel.Cursor = c1;
+            //statusBar.Text = ("Mandelbrot-Set will be produced - please wait...");
             for (x = 0; x < x1; x += 2)
+            {
                 for (y = 0; y < y1; y++)
                 {
                     h = PixelColour(xstart + xzoom * (double)x, ystart + yzoom * (double)y); // color value
                     if (h != alt)
                     {
-                        b = 1.0f - h * h; // brightnes
-                                          ///djm added
-                        Color col = HSB.ToRGB(h, 0.8f, b);
-                        pen = new Pen(col);
+                        b = 1.0f - h * h;
+                        //calling method of ToHSB class(passing value into)                   
+                        col = HSB.ToRGB(h, 0.8f, b, change);
+                        pn = new Pen(col);
+                        //djm 
                         alt = h;
                     }
-                    g.DrawLine(pen, x, y, x + 1, y);
+                    g.DrawLine(pn, x, y, x + 1, y);
                 }
-            this.Cursor = c2;
+            }
+            //statusBar.Text = ("Mandelbrot-Set ready - please select zoom area with pressed mouse.");
+            panel.Cursor = c2;
             action = true;
         }
 
@@ -189,7 +211,8 @@ namespace Fractal
             return (float)j / (float)MAX;
         }
 
-        public void update(Graphics g)
+        //the rectangle box formed when rmb is pressed and dragged to zoom in on the image
+        public void Update(Graphics g)
         {
             Pen pen = new Pen(Color.White, 2);
 
@@ -209,7 +232,75 @@ namespace Fractal
                 }
             } 
         }
+        private void saveImageAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Submenu which allows users to save the image formed in the file format that they desire   
+            SaveFileDialog sd = new SaveFileDialog();
+            sd.Filter = "jpeg|*.jpg|Bitmap|*.bmp|Gif|*.gif |Png|*.png";
+            sd.Title = "Save Image File";
+            sd.ShowDialog();
 
+            // If condition to save the file given that the name is not empty  
+            if (sd.FileName != "")
+            {
+                // Saves the Image via a FileStream created by the OpenFile method.  
+                FileStream fs =
+                   (FileStream)sd.OpenFile();
+                // Prompts a dialogue box from which the users can save the image from the image format given below
+                // NOTE that the FilterIndex property is one-based.  
+                switch (sd.FilterIndex)
+                {
+                    case 1:
+                        picture.Save(fs, ImageFormat.Jpeg);
+                        break;
+
+                    case 2:
+                        picture.Save(fs, ImageFormat.Bmp);
+                        break;
+
+                    case 3:
+                        picture.Save(fs, ImageFormat.Gif);
+                        break;
+
+                    case 4:
+                        picture.Save(fs, ImageFormat.Png);
+                        break;
+                }
+
+                fs.Close();
+            }
+        }
+
+        //when "Change Color" is pressed
+        private void changeColourToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Colour();
+            Mandelbrot();
+        }
+
+        //generates random colours which get displayed
+        private void Colour()
+        {
+            if (!cColour)
+            {
+                change[0] = Color.FromArgb(255, 255, 255);
+                change[1] = Color.FromArgb(255, 255, 255);
+                change[2] = Color.FromArgb(255, 255, 255);
+                change[3] = Color.FromArgb(255, 255, 255);
+                change[4] = Color.FromArgb(255, 255, 255);
+                change[5] = Color.FromArgb(255, 255, 255);
+                cColour = true;
+            }
+            else
+            {
+                change[0] = Color.FromArgb(rd.Next(255), rd.Next(255), rd.Next(255));
+                change[1] = Color.FromArgb(rd.Next(255), rd.Next(255), rd.Next(255));
+                change[2] = Color.FromArgb(rd.Next(255), rd.Next(255), rd.Next(255));
+                change[3] = Color.FromArgb(rd.Next(255), rd.Next(255), rd.Next(255));
+                change[4] = Color.FromArgb(rd.Next(255), rd.Next(255), rd.Next(255));
+                change[5] = Color.FromArgb(rd.Next(255), rd.Next(255), rd.Next(255));
+            }
+        }
 
     }
 }

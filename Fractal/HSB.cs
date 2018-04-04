@@ -16,7 +16,7 @@ namespace Fractal
             red = green = blue = 0;
 
         }
-        public static Color ToRGB(float hue, float saturation, float brightness)
+        public static Color ToRGB(float hue, float saturation, float brightness, Color[] col)
         {
             int r = 0, g = 0, b = 0;
             if (saturation == 0)
@@ -33,34 +33,40 @@ namespace Fractal
                 switch ((int)h)
                 {
                     case 0:
-                        r = (int)(brightness * 255.0f + 0.5f);
-                        g = (int)(t * 255.0f + 0.5f);
-                        b = (int)(p * 255.0f + 0.5f);
+                        Color col0 = col[0];
+                        r = (int)(brightness * (col0.R * 1.0f) + 0.5f);
+                        g = (int)(t * (col0.G * 1.0f) + 0.5f);
+                        b = (int)(p * (col0.B * 1.0f) + 0.5f);
                         break;
                     case 1:
-                        r = (int)(q * 255.0f + 0.5f);
-                        g = (int)(brightness * 255.0f + 0.5f);
-                        b = (int)(p * 255.0f + 0.5f);
+                        Color col1 = col[1];
+                        r = (int)(q * (col1.R * 1.0f) + 0.5f);
+                        g = (int)(brightness * (col1.G * 1.0f) + 0.5f);
+                        b = (int)(p * (col1.B * 1.0f) + 0.5f);
                         break;
                     case 2:
-                        r = (int)(p * 255.0f + 0.5f);
-                        g = (int)(brightness * 255.0f + 0.5f);
-                        b = (int)(t * 255.0f + 0.5f);
+                        Color col2 = col[2];
+                        r = (int)(p * (col2.R * 1.0f) + 0.5f);
+                        g = (int)(brightness * (col2.G * 1.0f) + 0.5f);
+                        b = (int)(t * (col2.B * 1.0f) + 0.5f);
                         break;
                     case 3:
-                        r = (int)(p * 255.0f + 0.5f);
-                        g = (int)(q * 255.0f + 0.5f);
-                        b = (int)(brightness * 255.0f + 0.5f);
+                        Color col3 = col[3];
+                        r = (int)(p * (col3.R * 1.0f) + 0.5f);
+                        g = (int)(q * (col3.G * 1.0f) + 0.5f);
+                        b = (int)(brightness * (col3.B * 1.0f) + 0.5f);
                         break;
                     case 4:
-                        r = (int)(t * 255.0f + 0.5f);
-                        g = (int)(p * 255.0f + 0.5f);
-                        b = (int)(brightness * 255.0f + 0.5f);
+                        Color col4 = col[4];
+                        r = (int)(t * (col4.R * 1.0f) + 0.5f);
+                        g = (int)(p * (col4.G * 1.0f) + 0.5f);
+                        b = (int)(brightness * (col4.B * 1.0f) + 0.5f);
                         break;
                     case 5:
-                        r = (int)(brightness * 255.0f + 0.5f);
-                        g = (int)(p * 255.0f + 0.5f);
-                        b = (int)(q * 255.0f + 0.5f);
+                        Color col5 = col[5];
+                        r = (int)(brightness * (col5.R * 1.0f) + 0.5f);
+                        g = (int)(p * (col5.G * 1.0f) + 0.5f);
+                        b = (int)(q * (col5.B * 1.0f) + 0.5f);
                         break;
                 }
             }
