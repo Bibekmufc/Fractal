@@ -29,19 +29,17 @@ namespace Fractal
         private Graphics g;
         private Cursor c1, c2;
         private bool cColour;
+        private HSB HSBcol = new HSB();
         Random rd = new Random();
         Color[] change = new Color[6];
         String[] settings = new String[4];
-
-
-
-        private HSB HSBcol = new HSB();
         private bool clicked = false;
 
 
         public Fractal()
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
         }
 
         //loads form
@@ -52,8 +50,22 @@ namespace Fractal
             start();
         }
 
+        //paints mandlebrot in the designated panel
+        private void panel_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics graphics = e.Graphics;
+            graphics.DrawImage(picture, 0, 0);
+        }
 
-
+        private void initvalues() // reset start values
+        {
+            xstart = sX;
+            ystart = sY;
+            xend = eX;
+            yend = eY;
+            if ((float)((xend - xstart) / (yend - ystart)) != xy)
+                xstart = xend - (yend - ystart) * (double)xy;
+        }
         //starts when form loads
         public void init() // all instances will be prepared
         {
@@ -81,100 +93,20 @@ namespace Fractal
            
         }
 
-
-        private void initvalues() // reset start values
+        private float PixelColour(double xwert, double ywert) // color value from 0.0 to 1.0 by iterations
         {
-            xstart = sX;
-            ystart = sY;
-            xend = eX;
-            yend = eY;
-            if ((float)((xend - xstart) / (yend - ystart)) != xy)
-                xstart = xend - (yend - ystart) * (double)xy;
-        }
+            double r = 0.0, i = 0.0, m = 0.0;
+            int j = 0;
 
-        //when right mouse button(rmb) is pressed
-        private void panel_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (action)
+            while ((j < MAX) && (m < 4.0))
             {
-                xs = e.X;
-                ys = e.Y;
-                rectangle = true;
+                j++;
+                m = r * r - i * i;
+                i = 2.0 * r * i + ywert;
+                r = m + xwert;
             }
+            return (float)j / (float)MAX;
         }
-
-        //when rmb is pressed and moved
-        private void panel_MouseMove(object sender, MouseEventArgs e)
-        {
-
-            if (action)
-            {
-                xe = e.X;
-                ye = e.Y;
-
-                Graphics g = panel.CreateGraphics();
-                Update(g);
-            }
-        }
-
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
-
-
-      
-        //when rmb is released
-        private void panel_MouseUp(object sender, MouseEventArgs e)
-        {
-            int z, w;
-
-            if (action)
-            {
-                xe = e.X;
-                ye = e.Y;
-                if (xs > xe)
-                {
-                    z = xs;
-                    xs = xe;
-                    xe = z;
-                }
-                if (ys > ye)
-                {
-                    z = ys;
-                    ys = ye;
-                    ye = z;
-                }
-                w = (xe - xs);
-                z = (ye - ys);
-                if ((w < 2) && (z < 2)) initvalues();
-                else
-                {
-                    if (((float)w > (float)z * xy)) ye = (int)((float)ys + (float)w / xy);
-                    else xe = (int)((float)xs + (float)z * xy);
-                    xend = xstart + xzoom * (double)xe;
-                    yend = ystart + yzoom * (double)ye;
-                    xstart += xzoom * (double)xs;
-                    ystart += yzoom * (double)ys;
-                }
-                xzoom = (xend - xstart) / (double)x1;
-                yzoom = (yend - ystart) / (double)y1;
-                Mandelbrot();
-                rectangle = false;
-                
-            }
-        }
-
-        //paints mandlebrot in the designated panel
-        private void panel_Paint(object sender, PaintEventArgs e)
-        {
-            Graphics graphics = e.Graphics;
-            graphics.DrawImage(picture, 0, 0);
-        }
-
-        
-
 
         // Algorithm for Mandelbrot Calculation
         private void Mandelbrot() // calculates all possible points
@@ -209,22 +141,72 @@ namespace Fractal
             action = true;
         }
 
-        private float PixelColour(double xwert, double ywert) // color value from 0.0 to 1.0 by iterations
+        //when right mouse button(rmb) is pressed
+        private void panel_MouseDown(object sender, MouseEventArgs e)
         {
-            double r = 0.0, i = 0.0, m = 0.0;
-            int j = 0;
-
-            while ((j < MAX) && (m < 4.0))
+            if (action)
             {
-                j++;
-                m = r * r - i * i;
-                i = 2.0 * r * i + ywert;
-                r = m + xwert;
+                xs = e.X;
+                ys = e.Y;
+                rectangle = true;
             }
-            return (float)j / (float)MAX;
         }
 
-      
+        //when rmb is pressed and moved
+        private void panel_MouseMove(object sender, MouseEventArgs e)
+        {
+
+            if (action)
+            {
+                xe = e.X;
+                ye = e.Y;
+
+                Graphics g = panel.CreateGraphics();
+                Update(g);
+            }
+        }
+
+        //when rmb is released
+        private void panel_MouseUp(object sender, MouseEventArgs e)
+        {
+            clicked = false;
+            int z, w;
+
+            if (action)
+            {
+                xe = e.X;
+                ye = e.Y;
+                if (xs > xe)
+                {
+                    z = xs;
+                    xs = xe;
+                    xe = z;
+                }
+                if (ys > ye)
+                {
+                    z = ys;
+                    ys = ye;
+                    ye = z;
+                }
+                w = (xe - xs);
+                z = (ye - ys);
+                if ((w < 2) && (z < 2)) initvalues();
+                else
+                {
+                    if (((float)w > (float)z * xy)) ye = (int)((float)ys + (float)w / xy);
+                    else xe = (int)((float)xs + (float)z * xy);
+                    xend = xstart + xzoom * (double)xe;
+                    yend = ystart + yzoom * (double)ye;
+                    xstart += xzoom * (double)xs;
+                    ystart += yzoom * (double)ys;
+                }
+                xzoom = (xend - xstart) / (double)x1;
+                yzoom = (yend - ystart) / (double)y1;
+                Mandelbrot();
+                rectangle = false;
+
+            }
+        }
 
         //the rectangle box formed when rmb is pressed and dragged to zoom in on the image
         public void Update(Graphics g)
@@ -317,16 +299,25 @@ namespace Fractal
             }
         }
 
+        //exit in the menustrip
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        //start colour cycle
         private void cycleColourToolStripMenuItem_Click(object sender, EventArgs e)
         {
             timer1.Start();
         }
 
+        //stop colour cycle
         private void stopCyclingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             timer1.Stop();
         }
 
+        //timer to initiate the colour cycle
         private void timer1_Tick(object sender, EventArgs e)
         {
             Colour();
@@ -419,8 +410,6 @@ namespace Fractal
             change[3] = Color.FromArgb(Convert.ToInt32(set[13]), Convert.ToInt32(set[14]), Convert.ToInt32(set[15]));
             change[4] = Color.FromArgb(Convert.ToInt32(set[16]), Convert.ToInt32(set[17]), Convert.ToInt32(set[18]));
             change[5] = Color.FromArgb(Convert.ToInt32(set[19]), Convert.ToInt32(set[20]), Convert.ToInt32(set[21]));
-
-
             Mandelbrot();
         }
     }

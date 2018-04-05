@@ -138,6 +138,7 @@
             this.panel.Size = new System.Drawing.Size(1102, 462);
             this.panel.TabIndex = 1;
             this.panel.TabStop = false;
+            this.panel.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Paint);
             this.panel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel_MouseDown);
             this.panel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel_MouseMove);
             this.panel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel_MouseUp);
@@ -161,7 +162,6 @@
             // 
             // timer1
             // 
-            this.timer1.Interval = 500;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Fractal
@@ -173,8 +173,11 @@
             this.Controls.Add(this.panel);
             this.Controls.Add(this.menu);
             this.MainMenuStrip = this.menu;
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(1120, 568);
+            this.MinimumSize = new System.Drawing.Size(1120, 568);
             this.Name = "Fractal";
-            this.Text = "Form1";
+            this.Text = "Fractal";
             this.Load += new System.EventHandler(this.Fractal_Load);
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
