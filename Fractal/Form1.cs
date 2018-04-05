@@ -31,6 +31,8 @@ namespace Fractal
         private bool cColour;
         Random rd = new Random();
         Color[] change = new Color[6];
+        String[] settings = new String[4];
+
 
 
         private HSB HSBcol = new HSB();
@@ -40,8 +42,6 @@ namespace Fractal
         public Fractal()
         {
             InitializeComponent();
-            this.DoubleBuffered = true;
-
         }
 
         //loads form
@@ -51,6 +51,8 @@ namespace Fractal
             Colour();
             start();
         }
+
+
 
         //starts when form loads
         public void init() // all instances will be prepared
@@ -76,6 +78,7 @@ namespace Fractal
             xzoom = (xend - xstart) / (double)x1;
             yzoom = (yend - ystart) / (double)y1;
             Mandelbrot();
+           
         }
 
 
@@ -114,6 +117,14 @@ namespace Fractal
             }
         }
 
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+
+
+      
         //when rmb is released
         private void panel_MouseUp(object sender, MouseEventArgs e)
         {
@@ -149,11 +160,12 @@ namespace Fractal
                 }
                 xzoom = (xend - xstart) / (double)x1;
                 yzoom = (yend - ystart) / (double)y1;
-                rectangle = false;
                 Mandelbrot();
+                rectangle = false;
+                
             }
         }
-      
+
         //paints mandlebrot in the designated panel
         private void panel_Paint(object sender, PaintEventArgs e)
         {
@@ -161,6 +173,7 @@ namespace Fractal
             graphics.DrawImage(picture, 0, 0);
         }
 
+        
 
 
         // Algorithm for Mandelbrot Calculation
@@ -173,7 +186,7 @@ namespace Fractal
 
             action = false;
             panel.Cursor = c1;
-            //statusBar.Text = ("Mandelbrot-Set will be produced - please wait...");
+            status.Text = ("Mandelbrot-Set will be produced - please wait...");
             for (x = 0; x < x1; x += 2)
             {
                 for (y = 0; y < y1; y++)
@@ -191,7 +204,7 @@ namespace Fractal
                     g.DrawLine(pn, x, y, x + 1, y);
                 }
             }
-            //statusBar.Text = ("Mandelbrot-Set ready - please select zoom area with pressed mouse.");
+            status.Text = ("Mandelbrot-Set ready - please select zoom area with pressed mouse.");
             panel.Cursor = c2;
             action = true;
         }
@@ -210,6 +223,8 @@ namespace Fractal
             }
             return (float)j / (float)MAX;
         }
+
+      
 
         //the rectangle box formed when rmb is pressed and dragged to zoom in on the image
         public void Update(Graphics g)
@@ -230,7 +245,7 @@ namespace Fractal
                     if (ys < ye) g.DrawRectangle(pen, xe, ys, (xs - xe), (ye - ys));
                     else g.DrawRectangle(pen, xe, ye, (xs - xe), (ys - ye));
                 }
-            } 
+            }
         }
         private void saveImageAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -302,5 +317,111 @@ namespace Fractal
             }
         }
 
+        private void cycleColourToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            timer1.Start();
+        }
+
+        private void stopCyclingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            timer1.Stop();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Colour();
+            Mandelbrot();
+            panel.Refresh();
+        }
+
+        //when save state is clicked
+        private void saveStateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SState();
+        }
+
+        //when load state is clicked
+        private void loadStateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LState();
+        }
+
+        //read values from the file to load state
+        private String[] ReadFile()
+        {
+            String line = "";
+            String tempStrore = "";
+            OpenFileDialog od = new OpenFileDialog();
+            od.Title = "Open File";
+            // Shows dialogue box and checks iff the user clicked OK
+            if (od.ShowDialog() == DialogResult.OK)
+            {
+                FileStream fs = (FileStream)od.OpenFile();
+                StreamReader sr = new StreamReader(fs);
+                while ((line = sr.ReadLine()) != null)
+                {
+                    tempStrore += (line + ",");
+                }
+                settings = tempStrore.Split(',');
+                sr.Close();
+            }
+            return settings;
+        }
+
+        //method to save state
+        private void SState()
+        {
+            SaveFileDialog sd = new SaveFileDialog();
+            sd.Filter = "Text File|*.txt";
+            if (sd.ShowDialog() == DialogResult.OK)
+            {
+                FileStream fs = (FileStream)sd.OpenFile();
+                StreamWriter sw = new StreamWriter(fs);
+                sw.WriteLine(xstart);
+                sw.WriteLine(ystart);
+                sw.WriteLine(xend);
+                sw.WriteLine(yend);
+                sw.WriteLine(change[0].R);
+                sw.WriteLine(change[0].G);
+                sw.WriteLine(change[0].B);
+                sw.WriteLine(change[1].R);
+                sw.WriteLine(change[1].G);
+                sw.WriteLine(change[1].B);
+                sw.WriteLine(change[2].R);
+                sw.WriteLine(change[2].G);
+                sw.WriteLine(change[2].B);
+                sw.WriteLine(change[3].R);
+                sw.WriteLine(change[3].G);
+                sw.WriteLine(change[3].B);
+                sw.WriteLine(change[4].R);
+                sw.WriteLine(change[4].G);
+                sw.WriteLine(change[4].B);
+                sw.WriteLine(change[5].R);
+                sw.WriteLine(change[5].G);
+                sw.WriteLine(change[5].B);
+                sw.Close();
+            }
+        }
+
+        //method to load state
+        private void LState()
+        {
+            string[] set = ReadFile();
+            xstart = Convert.ToDouble(set[0]);
+            ystart = Convert.ToDouble(set[1]);
+            xend = Convert.ToDouble(set[2]);
+            yend = Convert.ToDouble(set[3]);
+            xzoom = (xend - xstart) / (double)x1;
+            yzoom = (yend - ystart) / (double)y1;
+            change[0] = Color.FromArgb(Convert.ToInt32(set[4]), Convert.ToInt32(set[5]), Convert.ToInt32(set[6]));
+            change[1] = Color.FromArgb(Convert.ToInt32(set[7]), Convert.ToInt32(set[8]), Convert.ToInt32(set[9]));
+            change[2] = Color.FromArgb(Convert.ToInt32(set[10]), Convert.ToInt32(set[11]), Convert.ToInt32(set[12]));
+            change[3] = Color.FromArgb(Convert.ToInt32(set[13]), Convert.ToInt32(set[14]), Convert.ToInt32(set[15]));
+            change[4] = Color.FromArgb(Convert.ToInt32(set[16]), Convert.ToInt32(set[17]), Convert.ToInt32(set[18]));
+            change[5] = Color.FromArgb(Convert.ToInt32(set[19]), Convert.ToInt32(set[20]), Convert.ToInt32(set[21]));
+
+
+            Mandelbrot();
+        }
     }
 }
