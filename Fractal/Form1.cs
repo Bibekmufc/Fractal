@@ -93,7 +93,7 @@ namespace Fractal
            
         }
 
-        private float PixelColour(double xwert, double ywert) // color value from 0.0 to 1.0 by iterations
+        private float PixelColour(double xwert, double ywert) //colorurs the mandlebrot formed
         {
             double r = 0.0, i = 0.0, m = 0.0;
             int j = 0;
@@ -208,6 +208,26 @@ namespace Fractal
             }
         }
 
+        private void aboutToolStripMenuItem_Click_1(object sender, EventArgs e) //info about the program
+        {
+            MessageBox.Show("Project Mandelbrot by: " + Environment.NewLine +
+                "Name: Bibek Gautam" + Environment.NewLine +
+                "Email: bibekmufc21@gmail.com" + Environment.NewLine + 
+                "Developed in Microsoft Visual Studio Community Edition" + Environment.NewLine +
+                "Version 1.0" + Environment.NewLine, "About");
+        }
+
+        private void howToToolStripMenuItem_Click(object sender, EventArgs e) //instructions on how to use the program
+        {
+            MessageBox.Show("File > Save Image As: Saves the image in the format desired." + Environment.NewLine +
+                "File > Save State: Saves the current state" + Environment.NewLine +
+                "File > Load State: Loads from selected state" + Environment.NewLine +
+                "Colour Palette > Change Colour: Changes the image to a random colour" + Environment.NewLine +
+                "Colour Palette > Cycle Colour: Cycles and animates the image with different colours" + Environment.NewLine +
+                "Colour Palette > Stop Cycling: Stops the animation" + Environment.NewLine +
+                "Exit: Exits this program" + Environment.NewLine, "How To Use This Application");
+        }
+
         //the rectangle box formed when rmb is pressed and dragged to zoom in on the image
         public void Update(Graphics g)
         {
@@ -233,7 +253,7 @@ namespace Fractal
         {
             // Submenu which allows users to save the image formed in the file format that they desire   
             SaveFileDialog sd = new SaveFileDialog();
-            sd.Filter = "jpeg|*.jpg|Bitmap|*.bmp|Gif|*.gif |Png|*.png";
+            sd.Filter = "JPEG(*.jpeg)|*.jpg|Bitmap(*.bmp)|*.bmp|Gif(*.gif)|*.gif |Png(*.png)|*.png";
             sd.Title = "Save Image File";
             sd.ShowDialog();
 
